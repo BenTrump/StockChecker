@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 import datetime as dt
 from alpha_vantage.timeseries import TimeSeries
-import pandas as pd
+#  import pandas as pd
 
 
 class Commands:
@@ -11,20 +11,30 @@ class Commands:
 
     @staticmethod
     def check(*args):
+        print(args)
         ts = TimeSeries(key='EJ69MPM068NGTJ30', output_format='pandas')
         data, meta_data = ts.get_batch_stock_quotes(symbols=args)
-        print(data.head())
+        print(data.loc[:, ["1. symbol", "2. price", "4. timestamp"]])
         Calls()
 
-    @staticmethod
-    def daily(ticker):
+    def daily(self, ticker):
         ts = TimeSeries(key='EJ69MPM068NGTJ30', output_format='pandas')
         data, meta_data = ts.get_intraday(symbol=ticker, interval='1min', outputsize="full")
-        data["4. close"].plot()
-        plot.title("%s closing times, 1 minute interval")
-        plot.grid()
-        plot.show()
+        new_data = data.loc[str(self.date_today) + " 09:31:00":, "4. close"]
+        new_data.plot(title="Closing values, 1 min interval")
+        plt.xlabel("Eastern Standard Time")
+        plt.grid()
+        plt.show()
         Calls()
+
+    def change(self, *args):
+        for ticker in args[0]:
+            ts = TimeSeries(key='EJ69MPM068NGTJ30', output_format='pandas')
+            data, meta_data = ts.get_intraday(symbol=ticker.upper(), interval='1min', outputsize="full")
+            open_price = data.loc[str(self.date_today) + " 09:31:00", "1. open"]
+            close_price = data.iloc[-1, 3]
+            percent_change = (close_price - open_price)/open_price*100
+            print(ticker.upper() + "  " + "%.2f" % percent_change + "%")
 
 
 class Calls:
@@ -38,6 +48,9 @@ class Calls:
         call = input("$").split(" ")
         if call[0] == "check":
             command.check(', '.join(call[1:]))
+
+        if call[0] == "change":
+            command.change(call[1:])
 
         elif call[0] == "daily":
             command.daily(call[1])
