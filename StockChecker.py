@@ -32,7 +32,7 @@ class Commands:
         ts = TimeSeries(key='EJ69MPM068NGTJ30', output_format='pandas')
         data, meta_data = ts.get_batch_stock_quotes(symbols=args)
         print(data.loc[:, ["1. symbol", "2. price", "4. timestamp"]])
-        Calls()
+        choose_command()
 
     def daily(self, ticker):
         try:
@@ -45,7 +45,7 @@ class Commands:
             plt.show()
         except KeyError:
             print(ticker.upper() + " is an invalid ticker")
-        Calls()
+        choose_command()
 
     def change(self, *args):
         for ticker in args[0]:
@@ -59,11 +59,6 @@ class Commands:
             except KeyError:
                 print(ticker.upper() + " is an invalid ticker")
                 break
-        Calls()
-
-
-class Calls:
-    def __init__(self):
         choose_command()
 
 
@@ -77,7 +72,7 @@ def choose_command():
     elif call[0] == "change":
         if len(call[1:]) > 5:
             print("Alpha Vantage only allows 5 API calls/minute")
-            Calls()
+            choose_command()
         else:
             command.change(call[1:])
 
@@ -89,7 +84,7 @@ def choose_command():
 
     else:
         print("invalid command")
-        Calls()
+        choose_command()
 
 
-test = Calls()
+choose_command()
